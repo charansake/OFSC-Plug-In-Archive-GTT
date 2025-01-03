@@ -1,0 +1,125 @@
+<!-- favicon.ico update something in this file
+To update or create a favicon for your website, you can follow these steps:
+
+Create a Favicon Image:
+
+You can use an online tool like favicon.io to create a favicon from text, an image, or an emoji.
+
+Download the generated favicon.ico file.
+
+Place the Favicon File:
+
+Ensure the favicon.ico file is in the root directory of your project where your HTML file is located.
+
+Update HTML to Reference the Favicon:
+
+Add the following line within the <head> section of your HTML file to reference the favicon:
+
+html
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+Here’s an example of a simple favicon.ico file creation process:
+
+Generating a Favicon Using favicon.io:
+Go to favicon.io.
+
+Choose the type of favicon you want to create (text-based, from an image, or emoji).
+
+Customize your favicon (e.g., choose colors, text, font, etc.).
+
+Generate the favicon and download the favicon.ico file.
+
+Adding Favicon to Project Directory:
+Place the downloaded favicon.ico file in the root directory of your project:
+
+/project-directory
+  - favicon.ico
+  - index.html
+  - style.css
+  - plugin.js
+  - signature.js
+  - jspdf.min.js
+  - html2canvas.min.js
+Referencing Favicon in HTML:
+Ensure your HTML includes the link to the favicon:
+
+html -->
+<!DOCTYPE html>
+<html manifest="manifest.appcache"> 
+<head> 
+    <meta charset="utf-8"> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1"> 
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate"> 
+    <meta http-equiv="expires" content="0"> 
+    <meta http-equiv="pragma" content="no-cache"> 
+    <title>Sample Hosted Plugin</title> 
+    <link rel="stylesheet" href="./style.css"> 
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> 
+    <script src="./plugin.js"></script> 
+    <script src="jspdf.min.js"></script> 
+    <script src="html2canvas.min.js"></script>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Added favicon link -->
+</head>
+
+<body id="fsa_fsr_report">
+    <header class="header">
+        <div class="header-content">
+            <table class="table_header">
+                <tr>
+                    <td>Activity Id#: <span class="header-order-details" id="aid"></span></td>
+                </tr>
+                <tr>
+                    <td>Activity Type#: <span class="header-order-details" id="aworktype"></span></td>
+                </tr>
+                <tr>
+                    <td>Work State#: <span class="header-order-details" id="astatus"></span></td>
+                </tr>
+            </table>
+            <div class="header-heading">
+                <h1>Field Service Report</h1>
+                <div class="top_line"></div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <section id="contact_tbl" class="grid-container">
+            <div id="contact_tb2_1" class="grid-item">
+                <table>
+                    <tr>
+                        <th colspan="4" class="table-title">Customer Information</th>
+                    </tr>
+                    <tr>
+                        <td>Acct. Name: <span id="cname"></span></td>
+                    </tr>
+                    <tr>
+                        <td>City: <span id="ccity"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="contact_tb2_2" class="grid-item">
+                <table>
+                    <tr>
+                        <th colspan="4" class="table-title">Service Provider</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <canvas id="gtt_engineer_signature" width="400" height="200"></canvas>
+                            <img id="SFA_FSR_CUS" alt="Saved image png"/> 
+                            <a href="https://www.atni.com/" target="_blank">Visit ATN Website</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="comments-section">
+                <h3>Comment:</h3>
+                <textarea id="gtt_technician_comments" rows="4" placeholder="Technician comments" required></textarea>
+            </div>
+        </section>
+        <div class="button-container">
+            <button type="button" id="Submit" class="styled-button">Submit</button>
+            <button type="button" id="Dismiss" class="styled-button">Dismiss</button>
+        </div>
+    </div>
+    <script src="./signature.js"></script>
+</body>
+</html>

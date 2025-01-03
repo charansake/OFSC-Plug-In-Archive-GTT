@@ -1,0 +1,25 @@
+CACHE MANIFEST
+# APPCACHE MANIFEST
+# v1
+
+CACHE:
+./index.html
+./style.css
+./plugin-service-worker-interface.js
+./wakeup-predefined-scenarios.js
+./plugin.js
+./ofs-plugin-api.js
+./logo.svg
+./assets/favicon.ico  <!-- Add the favicon here -->
+https://code.jquery.com/jquery-3.1.1.min.js
+#icons:
+https://static.oracle.com/cdn/fnd/gallery/2204.0.0/images/ico-warning.svg
+https://static.oracle.com/cdn/fnd/gallery/2204.0.0/images/ico-notification.svg
+https://static.oracle.com/cdn/fnd/gallery/2204.0.0/images/ico-notification-off.svg
+https://static.oracle.com/cdn/fnd/gallery/2204.0.0/images/ico-package.svg
+https://static.oracle.com/cdn/fnd/gallery/2204.0.0/images/ico-new-version.svg
+
+FALLBACK:
+
+NETWORK:
+*
