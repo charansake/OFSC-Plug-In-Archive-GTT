@@ -24,8 +24,10 @@
                 const allowedOrigins = ["null", "http://localhost:8000"];
 
                 if (allowedOrigins.includes(currentOrigin)) {
+                    console.log("Sending message with wildcard target origin");
                     parent.postMessage(JSON.stringify(data), "*");
                 } else {
+                    console.log("Sending message with specific target origin");
                     parent.postMessage(JSON.stringify(data), targetOrigin);
                 }
             } catch (error) {
@@ -37,33 +39,52 @@
         this.open = function (data) {
             try {
                 const fields = [
-                    { id: "aworktype", value: data.activity.aworktype },
-                    { id: "gtt_technician_comments", value: data.activity.gtt_technician_comments || "" },
-                    { id: "astatus", value: data.activity.astatus },
-                    { id: "cname", value: data.activity.cname },
-                    { id: "date", value: data.activity.date },
-                    { id: "aid", value: data.activity.aid },
-                    { id: "ccity", value: data.activity.ccity },
-                    { id: "gtt_service_type", value: data.gtt_service_type },
-                    { id: "gtt_voice_plan", value: data.gtt_voice_plan },
-                    { id: "gtt_fwa_promo_code", value: data.gtt_fwa_promo_code }
+                    { id: "customerName", value: data.activity?.customerName || "" },
+                    { id: "streetAddress", value: data.activity?.streetAddress || "" },
+                    { id: "city", value: data.activity?.city || "" },
+                    { id: "customerNumber", value: data.activity?.customerNumber || "" },
+                    { id: "timeZone", value: data.activity?.timeZone || "" },
+                    { id: "aworktype", value: data.activity?.aworktype || "" },
+                    { id: "gtt_technician_comments", value: data.activity?.gtt_technician_comments || "" },
+                    { id: "astatus", value: data.activity?.astatus || "" },
+                    { id: "cname", value: data.activity?.cname || "" },
+                    { id: "date", value: data.activity?.date || "" },
+                    { id: "aid", value: data.activity?.aid || "" },
+                    { id: "ccity", value: data.activity?.ccity || "" },
+                    { id: "gtt_service_type", value: data?.gtt_service_type || "" },
+                    { id: "gtt_voice_plan", value: data?.gtt_voice_plan || "" },
+                    { id: "gtt_fwa_promo_code", value: data?.gtt_fwa_promo_code || "" }
                 ];
 
                 fields.forEach(field => {
-                    if (document.getElementById(field.id)) {
-                        document.getElementById(field.id).innerText = field.value;
+                    const element = document.getElementById(field.id);
+                    if (element) {
+                        element.innerText = field.value;
+                    } else {
+                        console.warn(`Element with ID ${field.id} not found.`);
                     }
                 });
 
-                document.getElementById("Submit").addEventListener("click", () => {
-                    setTimeout(() => {
-                        this.submitData(data);
-                    }, 0);
-                }, { passive: true });
+                // Add event listeners
+                const submitButton = document.getElementById("Submit");
+                if (submitButton) {
+                    submitButton.addEventListener("click", () => {
+                        setTimeout(() => {
+                            this.submitData(data);
+                        }, 0);
+                    }, { passive: true });
+                } else {
+                    console.warn("Submit button not found.");
+                }
 
-                document.getElementById("Dismiss").addEventListener("click", () => {
-                    this.sendPostMessageData({ apiVersion: 1, method: "close" });
-                }, { passive: true });
+                const dismissButton = document.getElementById("Dismiss");
+                if (dismissButton) {
+                    dismissButton.addEventListener("click", () => {
+                        this.sendPostMessageData({ apiVersion: 1, method: "close" });
+                    }, { passive: true });
+                } else {
+                    console.warn("Dismiss button not found.");
+                }
             } catch (e) {
                 console.error("Error processing activity data:", e);
             }
@@ -80,28 +101,31 @@
                             apiVersion: 1,
                             method: "update",
                             activity: {
-                                Name: data.activity?.resource_name ?? 'Unknown',
-                                City: data.activity?.ccity ?? 'Unknown',
-                                aworktype: data.activity?.aworktype ?? 'Unknown',
+                                Name: data.activity?.resource_name ?? 'charan',
+                                City: data.activity?.ccity ?? 'atp',
+                                aworktype: data.activity?.aworktype ?? 'gttso',
                                 gtt_technician_comments: comment.trim(),
-                                cname: data.activity?.cname ?? 'Unknown',
-                                activityId: data.activity?.activityId ?? 'Unknown',
+                                cname: data.activity?.cname ?? 'test',
+                                activityId: data.activity?.aid ?? '123123',
                                 Comment: comment.trim()
                             }
                         });
 
                         // Log success message for debugging
                         console.log("Data submitted successfully:", {
-                            Name: data.activity?.resource_name ?? 'Unknown',
-                            City: data.activity?.ccity ?? 'Unknown',
-                            aworktype: data.activity?.aworktype ?? 'Unknown',
+                            Name: data.activity?.resource_name ?? 'charan',
+                            City: data.activity?.ccity ?? 'atp',
+                            aworktype: data.activity?.aworktype ?? 'gttso',
                             gtt_technician_comments: comment.trim(),
-                            cname: data.activity?.cname ?? 'Unknown',
-                            activityId: data.activity?.activityId ?? 'Unknown',
+                            cname: data.activity?.cname ?? 'testing',
+                            activityId: data.activity?.aid ?? '123123',
                             Comment: comment.trim()
                         });
 
                         alert("Form submitted successfully!");
+
+                        // Redirect to previous screen
+                        window.history.back(); // Go back to the previous page
                     } catch (e) {
                         console.error("Error submitting data:", e);
                     }
@@ -117,9 +141,17 @@
         this.captureSignature = function (data) {
             try {
                 const canvas = document.getElementById("gtt_engineer_signature");
-                const img = document.getElementById("SFA_FSR_CUS");
-                img.src = canvas.toDataURL("image/png");
-                this.submitData(data);
+                if (canvas) {
+                    const img = document.getElementById("SFA_FSR_CUS");
+                    if (img) {
+                        img.src = canvas.toDataURL("image/png");
+                        this.submitData(data);
+                    } else {
+                        console.warn("Signature image element not found.");
+                    }
+                } else {
+                    console.error("Canvas element for signature not found.");
+                }
             } catch (error) {
                 console.error("Error capturing signature:", error);
             }
@@ -129,8 +161,12 @@
         this.clearSignature = function () {
             try {
                 const canvas = document.getElementById("gtt_engineer_signature");
-                const ctx = canvas.getContext("2d");
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (canvas) {
+                    const ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    console.error("Canvas element for signature not found.");
+                }
             } catch (error) {
                 console.error("Error clearing signature:", error);
             }
@@ -140,6 +176,18 @@
         this._messageListener = function (event) {
             try {
                 const data = JSON.parse(event.data);
+
+                // Check for undefined error object
+                if (data.method === "error") {
+                    if (!data.error) {
+                        console.warn("Error received from parent, but error object is undefined.");
+                        alert("An error occurred, but no details were provided.");
+                        return; // Exit early if no error object is provided
+                    } else {
+                        console.error("Error received from parent:", JSON.stringify(data.error));
+                        alert("Error: " + JSON.stringify(data.error));
+                    }
+                }
 
                 switch (data.method) {
                     case "init":
@@ -153,8 +201,8 @@
                         console.log("Update successful!");
                         break;
                     case "error":
-                        console.error("Error received from parent:", JSON.stringify(data.error));
-                        alert("Error: " + JSON.stringify(data.error));
+                        console.error("Error received from parent:", JSON.stringify(data.error || "No error details available"));
+                        alert("Error: " + JSON.stringify(data.error || "No error details available"));
                         break;
                     case "close":
                         this.sendPostMessageData({ apiVersion: 1, method: "close" });

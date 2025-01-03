@@ -67,7 +67,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    margin-top: 150px; /* Adds space to account for the fixed header */
+    margin-top: 200px; /* Adds space to account for the fixed header */
 }
 
 .grid-item {
@@ -130,5 +130,17 @@ textarea {
 
     .header-content {
         flex-direction: column;
+    }
+}
+
+/* Using the new forced-colors media feature */
+@media (forced-colors: active) {
+    body {
+        background-color: window;
+        color: windowText;
+    }
+    .container, .grid-item {
+        background-color: window;
+        color: windowText;
     }
 }
