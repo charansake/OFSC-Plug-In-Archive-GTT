@@ -7,6 +7,7 @@
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="expires" content="0">
     <meta http-equiv="pragma" content="no-cache">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes"> <!-- Updated meta tag -->
     <title>Sample Hosted Plugin</title>
     <link rel="stylesheet" href="./style.css">
@@ -30,19 +31,18 @@
         <div class="header-content">
             <table class="table_header">
                 <tr>
-                    <td>Customer Name: <span class="header-order-details" id="customerName"></span></td>
+                    <td>Service type: <span class="header-order-details" id="gtt_service_type"></span></td>
+                </tr>
+
+                <tr>
+                    <td>Routed date: <span class="header-order-details" id="auto_routed_to_date"></span></td>
                 </tr>
                 <tr>
-                    <td>Street Address: <span class="header-order-details" id="streetAddress"></span></td>
+                    <td>City: <span class="header-order-details" id="ccity"></span></td>
                 </tr>
+
                 <tr>
-                    <td>City: <span class="header-order-details" id="city"></span></td>
-                </tr>
-                <tr>
-                    <td>Customer Number: <span class="header-order-details" id="customerNumber"></span></td>
-                </tr>
-                <tr>
-                    <td>Time Zone: <span class="header-order-details" id="timeZone"></span></td>
+                    <td>Time Zone: <span class="header-order-details" id="c_zid"></span></td>
                 </tr>
                 <tr>
                     <td>Activity Id#: <span class="header-order-details" id="aid"></span></td>
@@ -70,9 +70,9 @@
                     <tr>
                         <td>Acct. Name: <span id="cname"></span></td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td>City: <span id="ccity"></span></td>
-                    </tr>
+                    </tr> -->
                 </table>
             </div>
             <div id="contact_tb2_2" class="grid-item">

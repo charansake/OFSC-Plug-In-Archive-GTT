@@ -39,21 +39,21 @@
         this.open = function (data) {
             try {
                 const fields = [
-                    { id: "customerName", value: data.activity?.customerName || "" },
-                    { id: "streetAddress", value: data.activity?.streetAddress || "" },
-                    { id: "city", value: data.activity?.city || "" },
-                    { id: "customerNumber", value: data.activity?.customerNumber || "" },
-                    { id: "timeZone", value: data.activity?.timeZone || "" },
+                    { id: "cname", value: data.activity?.cname || "" },
+                    // { id: "caddress", value: data.activity?.caddress || "" },
+                    
+                    // { id: "ch_dispatcher", value: data.activity?.ch_dispatcher || "" },
+                    { id: "c_zid", value: data.activity?.c_zid || "" },
                     { id: "aworktype", value: data.activity?.aworktype || "" },
                     { id: "gtt_technician_comments", value: data.activity?.gtt_technician_comments || "" },
                     { id: "astatus", value: data.activity?.astatus || "" },
-                    { id: "cname", value: data.activity?.cname || "" },
-                    { id: "date", value: data.activity?.date || "" },
+                    // { id: "cname", value: data.activity?.cname || "" },
+                    { id: "auto_routed_to_date", value: data.activity?.auto_routed_to_date || "" },
                     { id: "aid", value: data.activity?.aid || "" },
                     { id: "ccity", value: data.activity?.ccity || "" },
                     { id: "gtt_service_type", value: data?.gtt_service_type || "" },
-                    { id: "gtt_voice_plan", value: data?.gtt_voice_plan || "" },
-                    { id: "gtt_fwa_promo_code", value: data?.gtt_fwa_promo_code || "" }
+                    // { id: "gtt_voice_plan", value: data?.gtt_voice_plan || "" },
+                    // { id: "gtt_fwa_promo_code", value: data?.gtt_fwa_promo_code || "" }
                 ];
 
                 fields.forEach(field => {
@@ -101,24 +101,35 @@
                             apiVersion: 1,
                             method: "update",
                             activity: {
-                                Name: data.activity?.resource_name ?? 'charan',
-                                City: data.activity?.ccity ?? 'atp',
-                                aworktype: data.activity?.aworktype ?? 'gttso',
+                                gtt_service_type: data.activity?.gtt_service_type ?? ' ',
+                                auto_routed_to_date: data.activity?.auto_routed_to_date ?? ' ',
+                                City: data.activity?.ccity ?? ' ',
+                                c_zid: data.activity?.c_zid ?? ' ',
+                                // aid: data.activity?.aid ?? ' ',
+                                // cname: data.activity?.cname ?? ' ',
+                                // caddress: data.activity?.caddress ?? ' ',
+                                // ch_dispatcher: data.activity?.ch_dispatcher ?? ' ',
                                 gtt_technician_comments: comment.trim(),
-                                cname: data.activity?.cname ?? 'test',
-                                activityId: data.activity?.aid ?? '123123',
+                                cname: data.activity?.cname ?? ' ',
+                               
+                                
+                                astatus: data.activity?.astatus ?? ' ',
+                                aworktype: data.activity?.aworktype ?? ' ',
+                                aid: data.activity?.aid ?? ' ',
                                 Comment: comment.trim()
                             }
                         });
 
                         // Log success message for debugging
                         console.log("Data submitted successfully:", {
-                            Name: data.activity?.resource_name ?? 'charan',
-                            City: data.activity?.ccity ?? 'atp',
-                            aworktype: data.activity?.aworktype ?? 'gttso',
+                            gtt_service_type: data.activity?.gtt_service_type ?? ' ',
+                            auto_routed_to_date: data.activity?.auto_routed_to_date ?? ' ',
+                            City: data.activity?.ccity ?? ' ',
+                            aworktype: data.activity?.aworktype ?? ' ',
                             gtt_technician_comments: comment.trim(),
-                            cname: data.activity?.cname ?? 'testing',
-                            activityId: data.activity?.aid ?? '123123',
+                            cname: data.activity?.cname ?? ' ',
+                            activityId: data.activity?.aid ?? ' ',
+                            astatus: data.activity?.astatus ?? ' ',
                             Comment: comment.trim()
                         });
 

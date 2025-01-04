@@ -19,25 +19,25 @@ body {
 }
 
 .container {
-    width: 100%;
+    /* width: 1200%; */
     max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 200px;
     background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    box-shadow: 0 14px 81px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
 }
 
 /* Header Section */
 .header {
     background-color: #f1f1f1;
-    padding: 20px;
+    padding: 5px;
     width: 100%;
     position: fixed; /* Fixes the header at the top of the page */
     top: 0; /* Ensures the header is positioned at the top */
-    left: 0; /* Ensures the header spans across the width of the viewport */
-    z-index: 1000; /* Keeps the header on top of other elements */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    left: 10; /* Ensures the header spans across the width of the viewport */
+    /* z-index: 50; Keeps the header on top of other elements */
+    box-shadow: 10 12px 14px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
