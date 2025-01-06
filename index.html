@@ -3,102 +3,90 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="expires" content="0">
     <meta http-equiv="pragma" content="no-cache">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes"> <!-- Updated meta tag -->
-    <title>Sample Hosted Plugin</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Feedback with Star Rating</title>
     <link rel="stylesheet" href="./style.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="./plugin.js"></script>
-    <script src="jspdf.min.js"></script>
-    <script src="html2canvas.min.js"></script>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Added favicon link -->
-    <style>
-        @media (forced-colors: active) {
-            body {
-                background-color: window;
-                color: windowText;
-            }
-            /* Add any other high-contrast styles here */
-        }
-    </style>
 </head>
-<body id="fsa_fsr_report">
+<body id="feedback-page">
+    <!-- Header Section -->
     <header class="header">
         <div class="header-content">
-            <table class="table_header">
-                <tr>
-                    <td>Service type: <span class="header-order-details" id="gtt_service_type"></span></td>
-                </tr>
-
-                <tr>
-                    <td>Routed date: <span class="header-order-details" id="auto_routed_to_date"></span></td>
-                </tr>
-                <tr>
-                    <td>City: <span class="header-order-details" id="ccity"></span></td>
-                </tr>
-
-                <tr>
-                    <td>Time Zone: <span class="header-order-details" id="c_zid"></span></td>
-                </tr>
-                <tr>
-                    <td>Activity Id#: <span class="header-order-details" id="aid"></span></td>
-                </tr>
-                <tr>
-                    <td>Activity Type#: <span class="header-order-details" id="aworktype"></span></td>
-                </tr>
-                <tr>
-                    <td>Work State#: <span class="header-order-details" id="astatus"></span></td>
-                </tr>
-            </table>
-            <div class="header-heading">
-                <h1>Field Service Report</h1>
-                <div class="top_line"></div>
-            </div>
+            <h1>Give Us Your Feedback</h1>
+            <p>Let us know how we did! Your feedback is important to us.</p>
+            <div class="top-line"></div>
         </div>
     </header>
+
+    <!-- Feedback Form -->
     <div class="container">
-        <section id="contact_tbl" class="grid-container">
-            <div id="contact_tb2_1" class="grid-item">
-                <table>
-                    <tr>
-                        <th colspan="4" class="table-title">Customer Information</th>
-                    </tr>
-                    <tr>
-                        <td>Acct. Name: <span id="cname"></span></td>
-                    </tr>
-                    <!-- <tr>
-                        <td>City: <span id="ccity"></span></td>
-                    </tr> -->
-                </table>
+        <div class="feedback-section">
+            <h3>Rate Our Service</h3>
+
+            <!-- Star Rating -->
+            <div class="stars">
+                <label for="star1" class="star" data-value="1">&#9733;</label>
+                <label for="star2" class="star" data-value="2">&#9733;</label>
+                <label for="star3" class="star" data-value="3">&#9733;</label>
+                <label for="star4" class="star" data-value="4">&#9733;</label>
+                <label for="star5" class="star" data-value="5">&#9733;</label>
             </div>
-            <div id="contact_tb2_2" class="grid-item">
-                <table>
-                    <tr>
-                        <th colspan="4" class="table-title">Service Provider</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <canvas id="gtt_engineer_signature" width="400" height="200"></canvas>
-                            <img id="SFA_FSR_CUS" alt="Saved image png"/> 
-                            <a href="https://www.atni.com/" target="_blank">Visit ATN Website</a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="comments-section">
-                <h3>Comment:</h3>
-                <textarea id="gtt_technician_comments" rows="4" placeholder="Technician comments" required></textarea>
-            </div>
-        </section>
+
+            <!-- Feedback Text Area with Updated ID -->
+            <textarea id="gtt_technician_comments" rows="4" placeholder="Please share your thoughts here..." required></textarea>
+        </div>
+
+        <!-- Buttons Section -->
         <div class="button-container">
-            <button type="button" id="Submit" class="styled-button">Submit</button>
-            <button type="button" id="Dismiss" class="styled-button">Dismiss</button>
+            <button type="button" id="submitFeedback" class="styled-button">Submit Feedback</button>
+            <button type="button" id="clearFeedback" class="styled-button">Clear</button>
         </div>
     </div>
-    <script src="./signature.js"></script>
+
+    <script>
+        // Star Rating JavaScript
+        var stars = document.querySelectorAll('.star');
+        stars.forEach(function(star) {
+            star.addEventListener('click', function() {
+                var selectedRating = this.getAttribute('data-value');
+                document.getElementById('rating-value').value = selectedRating;
+                stars.forEach(function(star) {
+                    star.style.color = star.getAttribute('data-value') <= selectedRating ? '#ffbb33' : '#dcdcdc';
+                });
+            });
+        });
+
+        document.getElementById("submitFeedback").addEventListener("click", function() {
+            var feedbackComments = document.getElementById("gtt_technician_comments").value;
+            var rating = document.getElementById('rating-value').value;
+
+            if (!rating || !feedbackComments) {
+                alert("Please provide both rating and feedback.");
+            } else {
+                alert("Thank you for your feedback!");
+                document.getElementById("gtt_technician_comments").value = ''; // Clear feedback field after submission
+                document.getElementById('rating-value').value = ''; // Clear rating value after submission
+                stars.forEach(function(star) {
+                    star.style.color = '#dcdcdc'; // Reset stars color
+                });
+            }
+        });
+
+        document.getElementById("clearFeedback").addEventListener("click", function() {
+            document.getElementById("gtt_technician_comments").value = ''; // Clear comments
+            document.getElementById('rating-value').value = ''; // Clear rating value
+            stars.forEach(function(star) {
+                star.style.color = '#dcdcdc'; // Reset stars color
+            });
+        });
+    </script>
+
+    <!-- Hidden input for storing rating value -->
+    <input type="hidden" id="rating-value">
 </body>
 </html>
