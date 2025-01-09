@@ -10,104 +10,42 @@
     <meta http-equiv="pragma" content="no-cache">
     <meta name="mobile-web-app-capable" content="yes">
     <title>Feedback with Star Rating</title>
-    <link rel="icon" href="path/to/favicon.ico"> <!-- Provide the correct path to your favicon -->
-
-    <link rel="stylesheet" href="./style.css">
-    <script src="./plugin.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="plugin.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
     <style>
-        /* Updated Thank You Message Style (Smaller Scale) */
-        .thank-you-message {
-            text-align: center;
-            background-color: #f4f7f6;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 40px auto;
-            font-family: 'Arial', sans-serif;
-            transition: all 0.3s ease;
-            display: none; /* Hide initially */
-        }
-        .thank-you-message h2 {
-            font-size: 2.2em;
-            color: #4CAF50;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .thank-you-message p {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 25px;
-        }
-        .smiley-icon {
-            font-size: 5em;
-            color: #ff9800;
-            animation: bounce 1s infinite;
-            margin-bottom: 15px;
-        }
-        .thank-you-message .thumbs-up {
-            font-size: 2.5em;
-            color: #4CAF50;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        /* Bounce animation for the smiley icon */
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-8px);
-            }
-        }
-
-        /* Like Emoji (Thumbs-up) Grow Animation */
-        @keyframes thumbsUpClick {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.5); /* Grow the emoji */
-            }
-            100% {
-                transform: scale(1); /* Return to normal size */
-            }
-        }
-
-        .thumbs-up.clicked {
-            animation: thumbsUpClick 0.6s ease-out; /* Trigger the grow animation */
-        }
+        /* Same styling as before */
     </style>
 </head>
 <body id="feedback-page">
     <!-- Header Section -->
     <header id="header" class="header">
         <div class="header-content">
-            <h1>Give Us Your Feedback</h1>
-            <p>Let us know how we did! Your feedback is important to us.</p>
+            <h1 id="header-title">Give Us Your Feedback</h1>
+            <p id="header-description">Let us know how we did! Your feedback is important to us.</p>
         </div>
     </header>
 
     <!-- Feedback Form Container -->
     <div class="container" id="feedback-container">
+        <div class="one-time-submission">
+            <input id="aid" type="hidden" value="unique_activity_id">
+        </div>
         <div class="feedback-section">
             <h3>Rate Our Service</h3>
 
             <!-- Star Rating -->
-            <div id="feedback_rating" class="stars">
-                <label for="star1" class="star" data-value="1">&#9733;</label>
-                <label for="star2" class="star" data-value="2">&#9733;</label>
-                <label for="star3" class="star" data-value="3">&#9733;</label>
-                <label for="star4" class="star" data-value="4">&#9733;</label>
-                <label for="star5" class="star" data-value="5">&#9733;</label>
+            <div id="feedback_rating" class="stars" aria-label="Star Rating">
+                <label for="star1" class="star" data-value="1" aria-label="1 star">&#9733;</label>
+                <label for="star2" class="star" data-value="2" aria-label="2 stars">&#9733;</label>
+                <label for="star3" class="star" data-value="3" aria-label="3 stars">&#9733;</label>
+                <label for="star4" class="star" data-value="4" aria-label="4 stars">&#9733;</label>
+                <label for="star5" class="star" data-value="5" aria-label="5 stars">&#9733;</label>
             </div>
 
             <!-- Feedback Text Area -->
-            <textarea id="feedback_comments" rows="4" placeholder="Please share your thoughts here..." required></textarea>
+            <textarea id="feedback_comments" rows="4" placeholder="Please share your thoughts here..." required aria-label="Feedback Comments"></textarea>
         </div>
 
         <!-- Buttons Section -->
@@ -115,27 +53,34 @@
             <button id="submitfeedback">Submit Feedback</button>
             <button type="button" id="clearFeedback" class="styled-button">Clear</button>
         </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner"></div>
+    </div>
+
+    <!-- Thank You Message -->
+    <div class="thank-you-message" id="thank-you-message">
+        <h2>Thank You for Your Feedback!</h2>
+        <p>Your feedback has been successfully submitted.</p>
     </div>
 
     <!-- Hidden input for storing rating value -->
     <input type="hidden" id="rating-value">
 
-    <!-- Thank You Message (Initially hidden) -->
-    <div id="thank-you-message" class="thank-you-message">
-        <div class="smiley-icon">&#128522;</div>
-        <h2>Thank You for Your Feedback!</h2>
-        <p>Your opinion means a lot to us. We appreciate your time and effort!</p>
-        <div class="thumbs-up" id="thumbsUp">&#128077;</div> <!-- Thumbs-up emoji here -->
-    </div>
-
     <script>
+        // Check if feedback has been submitted before
+        if(localStorage.getItem('feedback_submitted') === 'true') {
+            document.getElementById('thank-you-message').classList.add('show');
+            document.getElementById('feedback-container').style.display = 'none';
+        }
+
         // Star Rating JavaScript
         var stars = document.querySelectorAll('.star');
         stars.forEach(function(star) {
             star.addEventListener('click', function() {
                 var selectedRating = this.getAttribute('data-value');
                 document.getElementById('rating-value').value = selectedRating;
-                
+    
                 // Update the color of stars based on selection
                 stars.forEach(function(star) {
                     if (parseInt(star.getAttribute('data-value')) <= selectedRating) {
@@ -145,11 +90,11 @@
                     }
                 });
             });
-
+    
             // Event listener for hover effect (rating preview)
             star.addEventListener('mouseover', function() {
                 var hoverRating = this.getAttribute('data-value');
-                
+    
                 // Highlight stars up to the hovered one
                 stars.forEach(function(star) {
                     if (parseInt(star.getAttribute('data-value')) <= hoverRating) {
@@ -159,58 +104,62 @@
                     }
                 });
             });
-
+    
             // Event listener for mouse out (resetting hover effect)
             star.addEventListener('mouseout', function() {
                 // Reset star colors based on the selected rating
                 var selectedRating = document.getElementById('rating-value').value;
                 stars.forEach(function(star) {
                     if (parseInt(star.getAttribute('data-value')) <= selectedRating) {
-                        star.style.color = '#ffbb33'; // Highlight stars in gold color
+                        star.style.color = '#ffbb33'; // Highlight selected stars
                     } else {
                         star.style.color = '#dcdcdc'; // Set the unselected stars to grey
                     }
                 });
             });
         });
-
-        // Submit Feedback Logic
-        document.getElementById("submitfeedback").addEventListener("click", function() {
-            var feedbackComments = document.getElementById("feedback_comments").value;
+    
+        // Submit Feedback button click event
+        document.getElementById('submitfeedback').addEventListener('click', function() {
             var rating = document.getElementById('rating-value').value;
-
-            // Check if feedback and rating are provided
-            if (!rating || !feedbackComments) {
-                alert("Please provide both rating and feedback.");
-            } else {
-                // Hide header and feedback container
-                document.getElementById('header').style.display = 'none';
-                document.getElementById('feedback-container').style.display = 'none';
-
-                // Show thank you message
-                document.getElementById('thank-you-message').style.display = 'block';
+            var feedbackText = document.getElementById('feedback_comments').value;
+    
+            if (!rating || !feedbackText.trim()) {
+                alert('Please provide both a rating and feedback.');
+                return;
             }
+    
+            // Show loading spinner
+            document.getElementById('loading-spinner').style.display = 'block';
+    
+            // Simulate form submission (you can integrate this with your backend)
+            setTimeout(function() {
+                document.getElementById('loading-spinner').style.display = 'none';
+    
+                // Store feedback submission in localStorage
+                localStorage.setItem('feedback_submitted', 'true');
+    
+                // Show Thank You message
+                document.getElementById('thank-you-message').classList.add('show');
+                document.getElementById('feedback-container').style.display = 'none';
+    
+                // Hide header after submission
+                document.querySelector('header').style.display = 'none';
+            }, 2000); // Simulated submission delay
         });
-
-        // Clear Feedback Logic
-        document.getElementById("clearFeedback").addEventListener("click", function() {
-            document.getElementById("feedback_comments").value = ''; // Clear comments
-            document.getElementById('rating-value').value = ''; // Clear rating value
+    
+        // Clear Feedback button click event
+        document.getElementById('clearFeedback').addEventListener('click', function() {
+            document.getElementById('rating-value').value = '';
+            document.getElementById('feedback_comments').value = '';
+    
+            // Reset the star colors
+            var stars = document.querySelectorAll('.star');
             stars.forEach(function(star) {
-                star.style.color = '#dcdcdc'; // Reset stars color
+                star.style.color = '#dcdcdc';
             });
         });
-
-        // Thumbs-up Emoji Click Animation
-        document.getElementById("thumbsUp").addEventListener("click", function() {
-            // Add the "clicked" class to trigger the animation
-            this.classList.add('clicked');
-
-            // Optional: Remove the class after animation ends (0.6s)
-            setTimeout(() => {
-                this.classList.remove('clicked');
-            }, 600); // Match animation duration
-        });
     </script>
+    
 </body>
 </html>

@@ -2,7 +2,6 @@
 
 (function () {
     window.OfscPlugin = function () {
-
         // Initialize the plugin
         this.init = function () {
             try {
@@ -14,8 +13,27 @@
                     showHeader: true,
                     enableBackButton: true
                 });
+
+                // Check if feedback has been submitted on page load
+                this._checkFeedbackStatus();
             } catch (error) {
                 console.error("Error initializing plugin:", error);
+            }
+        };
+
+        // Check feedback submission status from localStorage
+        this._checkFeedbackStatus = function () {
+            const aid = document.getElementById("aid")?.value; // Get the current aid
+            if (aid) {
+                const isFeedbackSubmitted = localStorage.getItem('feedbackSubmittedForAid_' + aid);
+                if (isFeedbackSubmitted) {
+                    this.showThankYouMessage();
+                    this._disableClearButton();  // Disable or hide the "Clear" button
+                    this._disableHeaderAndForm();   // Hide the header and form
+                } else {
+                    // Ensure header and feedback form are visible if feedback hasn't been submitted
+                    this._showFeedbackForm();
+                }
             }
         };
 
@@ -30,7 +48,6 @@
                 const target = allowedOrigins.includes(currentOrigin) ? "*" : targetOrigin;
 
                 parent.postMessage(JSON.stringify(data), target);
-                // Console log has been removed to keep it hidden from the console
             } catch (error) {
                 console.error("Error sending post message data:", error);
             }
@@ -40,11 +57,20 @@
         this.open = function (data) {
             try {
                 const fields = [
+                    { id: "aid", value: data.activity?.aid || "12" },
                     { id: "feedback_comments", value: data.activity?.feedback_comments || "" },
                     { id: "feedback_rating", value: data.activity?.feedback_rating || "" }
                 ];
 
-                // Set values for the fields
+                // Check if feedback for this `aid` has been submitted
+                const isFeedbackSubmitted = localStorage.getItem('feedbackSubmittedForAid_' + data.activity?.aid);
+                if (isFeedbackSubmitted) {
+                    this.showThankYouMessage();
+                    this._disableClearButton();  // Disable or hide the "Clear" button
+                    this._disableHeaderAndForm();   // Hide the header and form
+                    return;
+                }
+
                 fields.forEach(field => {
                     const element = document.getElementById(field.id);
                     if (element) {
@@ -58,11 +84,9 @@
                     }
                 });
 
-                // Initialize the star rating system
                 this._addStarRatingListeners();
-
-                // Add event listeners for the submit button
                 this._addSubmitButtonListener();
+                this._addClearButtonListener(); // Add listener for the clear button
             } catch (e) {
                 console.error("Error processing activity data:", e);
             }
@@ -95,11 +119,24 @@
             const submitButton = document.getElementById("submitfeedback");
             if (submitButton) {
                 submitButton.addEventListener("click", () => {
-                    console.log("Submit button clicked");  // Debugging log
-                    this.submitData();  // Call submitData on button click
+                    console.log("Submit button clicked");
+                    this.submitData();
                 });
             } else {
                 console.warn("Submit button with id 'submitfeedback' not found.");
+            }
+        };
+
+        // Add event listeners for the clear button
+        this._addClearButtonListener = function () {
+            const clearButton = document.getElementById("clearFeedback");
+            if (clearButton) {
+                clearButton.addEventListener("click", () => {
+                    console.log("Clear button clicked");
+                    this.clearForm();
+                });
+            } else {
+                console.warn("Clear button with id 'clearFeedback' not found.");
             }
         };
 
@@ -115,27 +152,31 @@
                 // Check if both rating and comment are provided
                 if (!comment || !rating) {
                     alert("Please enter both a comment and a rating before submitting.");
-                    return;  // Prevent submission
+                    return;
                 }
 
                 try {
+                    const aid = document.getElementById("aid").value;
+
                     // Send the feedback data to the parent system
                     this.sendPostMessageData({
                         apiVersion: 1,
                         method: "update",
                         activity: {
+                            aid: aid,
                             feedback_comments: comment,
-                            feedback_rating: rating  // Send the selected rating
+                            feedback_rating: rating
                         }
                     });
 
                     console.log("Data submitted successfully:", comment, rating);
 
-                    // Show Thank You message and hide form elements
-                    this.showThankYouMessage();
+                    // Mark feedback as submitted for this aid
+                    localStorage.setItem('feedbackSubmittedForAid_' + aid, true);
 
-                    // Save the data in local storage (optional)
-                    this.saveFeedbackLocally(comment, rating);
+                    this.showThankYouMessage();
+                    this._disableClearButton();  // Disable or hide the "Clear" button
+                    this._disableHeaderAndForm();   // Hide the header and form after submission
 
                 } catch (e) {
                     console.error("Error submitting data:", e);
@@ -147,9 +188,18 @@
             }
         };
 
+        // Disable or hide the "Clear" button after submission
+        this._disableClearButton = function () {
+            const clearButton = document.getElementById("clearFeedback");
+            if (clearButton) {
+                clearButton.disabled = true; // Disable the button
+                clearButton.style.display = 'none'; // Hide the button
+            }
+        };
+
         // Show Thank You message and disable the form
         this.showThankYouMessage = function () {
-            // Hide the feedback form elements
+            // Hide feedback form elements
             const feedbackSection = document.querySelector('.feedback-section');
             const submitButton = document.getElementById('submitfeedback');
             const header = document.querySelector('header');
@@ -161,10 +211,9 @@
                 submitButton.style.display = 'none';
             }
             if (header) {
-                header.style.display = 'none';
+                header.style.display = 'none'; // Hide the header
             }
 
-            // Show a Thank You message
             const thankYouMessage = document.querySelector('.thank-you-message');
             if (thankYouMessage) {
                 thankYouMessage.classList.add('show');
@@ -174,24 +223,39 @@
                 newMessage.innerHTML = "<h2>Thank You for Your Feedback!</h2><p>Your feedback has been successfully submitted.</p>";
                 document.body.appendChild(newMessage);
             }
+        };
 
-            // Optionally disable the "Clear" button if needed
-            const clearButton = document.getElementById("clearFeedback");
-            if (clearButton) {
-                clearButton.disabled = true;
+        // Clear the feedback form
+        this.clearForm = function () {
+            document.getElementById('feedback_comments').value = '';
+            document.getElementById('rating-value').value = '';
+            this._setStarRating(0); // Reset the star rating to zero
+        };
+
+        // Ensure header and form are shown if feedback has not been submitted
+        this._showFeedbackForm = function () {
+            const header = document.querySelector('header');
+            if (header) {
+                header.style.display = 'block';  // Ensure header is visible
+            }
+
+            const feedbackSection = document.querySelector('.feedback-section');
+            if (feedbackSection) {
+                feedbackSection.style.display = 'block';  // Ensure feedback form is visible
             }
         };
 
-        // Save the feedback data locally
-        this.saveFeedbackLocally = function (comment, rating) {
-            const feedbackData = {
-                comment: comment,
-                rating: rating,
-                submittedAt: new Date().toISOString()
-            };
+        // Hide header and feedback form after submission
+        this._disableHeaderAndForm = function () {
+            const header = document.querySelector('header');
+            if (header) {
+                header.style.display = 'none';  // Hide the header
+            }
 
-            localStorage.setItem('feedbackData', JSON.stringify(feedbackData));
-            console.log("Feedback data saved locally:", feedbackData);
+            const feedbackSection = document.querySelector('.feedback-section');
+            if (feedbackSection) {
+                feedbackSection.style.display = 'none';  // Hide the feedback form
+            }
         };
 
         // Message listener to handle responses from the parent system
@@ -199,7 +263,7 @@
             try {
                 let data;
 
-                // Check if event.data is an object or a string
+                // Parse the event data safely
                 if (typeof event.data === 'string') {
                     try {
                         data = JSON.parse(event.data);
@@ -216,23 +280,10 @@
 
                 // Ensure message is coming from a trusted origin
                 const trustedOrigins = ["https://atni1.test.fs.ocs.oraclecloud.com", "http://localhost:8000"];
-
                 if (!trustedOrigins.includes(event.origin)) {
                     console.warn('Message received from untrusted origin:', event.origin);
                     return;
                 }
-/*
-                if (data.method === "error") {
-                    // Handle error message from parent
-                    if (data.error) {
-                        console.error("Error received from parent:", data.error);
-                        alert("Error: " + data.error);
-                    } else {
-                        console.error("Error received from parent with no details.");
-                        alert("An error occurred. Please try again.");
-                    }
-                    return;
-                }*/
 
                 switch (data.method) {
                     case "init":
@@ -248,10 +299,8 @@
                     case "close":
                         this.sendPostMessageData({ apiVersion: 1, method: "close" });
                         break;
-                        /*
                     default:
                         console.log("Unknown method:", data.method);
-                        */
                 }
             } catch (error) {
                 console.error("Error handling message:", error);
@@ -264,5 +313,4 @@
         const plugin = new OfscPlugin();
         plugin.init();
     });
-
 })();

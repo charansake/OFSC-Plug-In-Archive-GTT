@@ -17,8 +17,8 @@ body {
     flex-direction: column;
     padding: 0 10px;
     overflow: hidden;
-    font-family: 'Roboto', Arial, sans-serif;
     min-height: 100vh;
+    transition: background 0.3s ease; /* Smooth background transition */
 }
 
 /* Header Styling */
@@ -31,8 +31,14 @@ header {
     width: 100%;
     max-width: 600px;
     margin-bottom: 20px;
+    transition: opacity 0.3s ease;
 }
 
+header.hidden {
+    opacity: 0;
+}
+
+/* Header Text */
 header h1 {
     font-size: 36px;
     font-weight: 700;
@@ -58,10 +64,12 @@ header p {
     margin-top: 15px;
     transition: box-shadow 0.3s ease;
     color: #333;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
-.container:hover {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+.container.hidden {
+    opacity: 0;
 }
 
 /* Feedback Section */
@@ -93,14 +101,13 @@ header p {
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.stars .star:hover,
-.stars .star:hover ~ .star {
-    color: #FC5C7D;
-    transform: scale(1.1);
-}
-
 .stars .star.selected {
     color: #6A82FB;
+}
+
+.stars .star:hover {
+    color: #FC5C7D;
+    transform: scale(1.1);
 }
 
 /* Feedback Textarea */
@@ -181,37 +188,21 @@ textarea:focus {
     outline: 3px solid #FC5C7D;
 }
 
-/* Thank You Message Styling */
-.thank-you-message {
-    display: none; /* Hidden by default */
-    text-align: center;
-    background-color: #E6FFED; /* Light green background */
-    padding: 40px 30px;
-    border-radius: 20px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    margin-top: 30px;
-    max-width: 600px;
-    width: 100%;
+/* Loading Spinner */
+#loading-spinner {
+    display: none;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #6A82FB;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin-top: 20px;
 }
 
-.thank-you-message h2 {
-    font-size: 36px;
-    color: #4CAF50; /* Bright green */
-    font-weight: 700;
-    margin-bottom: 20px;
-    letter-spacing: 1.5px;
-}
-
-.thank-you-message p {
-    font-size: 18px;
-    color: #333;
-    margin-top: 10px;
-    letter-spacing: 1px;
-}
-
-/* Show Thank You Message when feedback is submitted */
-.thank-you-message.show {
-    display: block;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Responsive Design */
@@ -229,17 +220,10 @@ textarea:focus {
         padding: 10px;
     }
 
-    .styled-button {
+    #submitfeedback, #clearFeedback {
         padding: 10px 18px;
         font-size: 14px;
-    }
-
-    #clearFeedback {
         width: 90%;
-    }
-
-    .thank-you-message {
-        padding: 25px 15px;
     }
 }
 
@@ -257,14 +241,10 @@ textarea:focus {
         padding: 8px;
     }
 
-    .styled-button {
+    #submitfeedback, #clearFeedback {
         padding: 8px 16px;
         font-size: 12px;
-    }
-
-    #clearFeedback {
-        padding: 6px 14px;
-        font-size: 12px;
+        width: 90%;
     }
 
     .thank-you-message {
@@ -273,7 +253,7 @@ textarea:focus {
     }
 }
 
-/* Animation on Hover for Buttons */
+/* Button Animation on Hover */
 button {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -283,7 +263,37 @@ button:hover {
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
 }
 
-.hidden { display: none; }
+/* Thank You Message Styling */
+.thank-you-message {
+    display: none; /* Hidden by default */
+    text-align: center;
+    background-color: #E6FFED; /* Light green background */
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
+    max-width: 600px;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
 
-.thank-you-message.show { display: block; }
+.thank-you-message.show {
+    display: block;
+    opacity: 1;
+}
 
+.thank-you-message h2 {
+    font-size: 36px;
+    color: #4CAF50; /* Bright green */
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 1.5px;
+}
+
+.thank-you-message p {
+    font-size: 18px;
+    color: #333;
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
