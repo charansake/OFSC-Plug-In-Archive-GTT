@@ -1,35 +1,104 @@
 <!DOCTYPE html>
-<html manifest="manifest.appcache">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="expires" content="0">
     <meta http-equiv="pragma" content="no-cache">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>Feedback with Star Rating</title>
+    <link rel="icon" href="path/to/favicon.ico"> <!-- Provide the correct path to your favicon -->
+
     <link rel="stylesheet" href="./style.css">
+    <script src="./plugin.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+    <style>
+        /* Updated Thank You Message Style (Smaller Scale) */
+        .thank-you-message {
+            text-align: center;
+            background-color: #f4f7f6;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 40px auto;
+            font-family: 'Arial', sans-serif;
+            transition: all 0.3s ease;
+            display: none; /* Hide initially */
+        }
+        .thank-you-message h2 {
+            font-size: 2.2em;
+            color: #4CAF50;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .thank-you-message p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .smiley-icon {
+            font-size: 5em;
+            color: #ff9800;
+            animation: bounce 1s infinite;
+            margin-bottom: 15px;
+        }
+        .thank-you-message .thumbs-up {
+            font-size: 2.5em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Bounce animation for the smiley icon */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        /* Like Emoji (Thumbs-up) Grow Animation */
+        @keyframes thumbsUpClick {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5); /* Grow the emoji */
+            }
+            100% {
+                transform: scale(1); /* Return to normal size */
+            }
+        }
+
+        .thumbs-up.clicked {
+            animation: thumbsUpClick 0.6s ease-out; /* Trigger the grow animation */
+        }
+    </style>
 </head>
 <body id="feedback-page">
     <!-- Header Section -->
-    <header class="header">
+    <header id="header" class="header">
         <div class="header-content">
             <h1>Give Us Your Feedback</h1>
             <p>Let us know how we did! Your feedback is important to us.</p>
-            <div class="top-line"></div>
         </div>
     </header>
 
-    <!-- Feedback Form -->
-    <div class="container">
+    <!-- Feedback Form Container -->
+    <div class="container" id="feedback-container">
         <div class="feedback-section">
             <h3>Rate Our Service</h3>
 
             <!-- Star Rating -->
-            <div class="stars">
+            <div id="feedback_rating" class="stars">
                 <label for="star1" class="star" data-value="1">&#9733;</label>
                 <label for="star2" class="star" data-value="2">&#9733;</label>
                 <label for="star3" class="star" data-value="3">&#9733;</label>
@@ -37,15 +106,26 @@
                 <label for="star5" class="star" data-value="5">&#9733;</label>
             </div>
 
-            <!-- Feedback Text Area with Updated ID -->
-            <textarea id="gtt_technician_comments" rows="4" placeholder="Please share your thoughts here..." required></textarea>
+            <!-- Feedback Text Area -->
+            <textarea id="feedback_comments" rows="4" placeholder="Please share your thoughts here..." required></textarea>
         </div>
 
         <!-- Buttons Section -->
         <div class="button-container">
-            <button type="button" id="submitFeedback" class="styled-button">Submit Feedback</button>
+            <button id="submitfeedback">Submit Feedback</button>
             <button type="button" id="clearFeedback" class="styled-button">Clear</button>
         </div>
+    </div>
+
+    <!-- Hidden input for storing rating value -->
+    <input type="hidden" id="rating-value">
+
+    <!-- Thank You Message (Initially hidden) -->
+    <div id="thank-you-message" class="thank-you-message">
+        <div class="smiley-icon">&#128522;</div>
+        <h2>Thank You for Your Feedback!</h2>
+        <p>Your opinion means a lot to us. We appreciate your time and effort!</p>
+        <div class="thumbs-up" id="thumbsUp">&#128077;</div> <!-- Thumbs-up emoji here -->
     </div>
 
     <script>
@@ -55,38 +135,82 @@
             star.addEventListener('click', function() {
                 var selectedRating = this.getAttribute('data-value');
                 document.getElementById('rating-value').value = selectedRating;
+                
+                // Update the color of stars based on selection
                 stars.forEach(function(star) {
-                    star.style.color = star.getAttribute('data-value') <= selectedRating ? '#ffbb33' : '#dcdcdc';
+                    if (parseInt(star.getAttribute('data-value')) <= selectedRating) {
+                        star.style.color = '#ffbb33'; // Highlight stars in gold color
+                    } else {
+                        star.style.color = '#dcdcdc'; // Set the unselected stars to grey
+                    }
+                });
+            });
+
+            // Event listener for hover effect (rating preview)
+            star.addEventListener('mouseover', function() {
+                var hoverRating = this.getAttribute('data-value');
+                
+                // Highlight stars up to the hovered one
+                stars.forEach(function(star) {
+                    if (parseInt(star.getAttribute('data-value')) <= hoverRating) {
+                        star.style.color = '#ffbb33'; // Highlight stars in gold color
+                    } else {
+                        star.style.color = '#dcdcdc'; // Set the unselected stars to grey
+                    }
+                });
+            });
+
+            // Event listener for mouse out (resetting hover effect)
+            star.addEventListener('mouseout', function() {
+                // Reset star colors based on the selected rating
+                var selectedRating = document.getElementById('rating-value').value;
+                stars.forEach(function(star) {
+                    if (parseInt(star.getAttribute('data-value')) <= selectedRating) {
+                        star.style.color = '#ffbb33'; // Highlight stars in gold color
+                    } else {
+                        star.style.color = '#dcdcdc'; // Set the unselected stars to grey
+                    }
                 });
             });
         });
 
-        document.getElementById("submitFeedback").addEventListener("click", function() {
-            var feedbackComments = document.getElementById("gtt_technician_comments").value;
+        // Submit Feedback Logic
+        document.getElementById("submitfeedback").addEventListener("click", function() {
+            var feedbackComments = document.getElementById("feedback_comments").value;
             var rating = document.getElementById('rating-value').value;
 
+            // Check if feedback and rating are provided
             if (!rating || !feedbackComments) {
                 alert("Please provide both rating and feedback.");
             } else {
-                alert("Thank you for your feedback!");
-                document.getElementById("gtt_technician_comments").value = ''; // Clear feedback field after submission
-                document.getElementById('rating-value').value = ''; // Clear rating value after submission
-                stars.forEach(function(star) {
-                    star.style.color = '#dcdcdc'; // Reset stars color
-                });
+                // Hide header and feedback container
+                document.getElementById('header').style.display = 'none';
+                document.getElementById('feedback-container').style.display = 'none';
+
+                // Show thank you message
+                document.getElementById('thank-you-message').style.display = 'block';
             }
         });
 
+        // Clear Feedback Logic
         document.getElementById("clearFeedback").addEventListener("click", function() {
-            document.getElementById("gtt_technician_comments").value = ''; // Clear comments
+            document.getElementById("feedback_comments").value = ''; // Clear comments
             document.getElementById('rating-value').value = ''; // Clear rating value
             stars.forEach(function(star) {
                 star.style.color = '#dcdcdc'; // Reset stars color
             });
         });
-    </script>
 
-    <!-- Hidden input for storing rating value -->
-    <input type="hidden" id="rating-value">
+        // Thumbs-up Emoji Click Animation
+        document.getElementById("thumbsUp").addEventListener("click", function() {
+            // Add the "clicked" class to trigger the animation
+            this.classList.add('clicked');
+
+            // Optional: Remove the class after animation ends (0.6s)
+            setTimeout(() => {
+                this.classList.remove('clicked');
+            }, 600); // Match animation duration
+        });
+    </script>
 </body>
 </html>

@@ -5,14 +5,18 @@
 
         // Initialize the plugin
         this.init = function () {
-            window.addEventListener("message", this._messageListener.bind(this), { passive: true });
-            this.sendPostMessageData({
-                apiVersion: 1,
-                method: "ready",
-                sendInitData: true,
-                showHeader: true,
-                enableBackButton: true
-            });
+            try {
+                window.addEventListener("message", this._messageListener.bind(this), { passive: true });
+                this.sendPostMessageData({
+                    apiVersion: 1,
+                    method: "ready",
+                    sendInitData: true,
+                    showHeader: true,
+                    enableBackButton: true
+                });
+            } catch (error) {
+                console.error("Error initializing plugin:", error);
+            }
         };
 
         // Send post message to the parent system
@@ -26,7 +30,7 @@
                 const target = allowedOrigins.includes(currentOrigin) ? "*" : targetOrigin;
 
                 parent.postMessage(JSON.stringify(data), target);
-                console.log("Message sent to parent:", data);
+                // Console log has been removed to keep it hidden from the console
             } catch (error) {
                 console.error("Error sending post message data:", error);
             }
@@ -35,137 +39,200 @@
         // Open the activity data and update the UI
         this.open = function (data) {
             try {
-                // Populate the technician comments and rating if available
                 const fields = [
-                    { id: "gtt_technician_comments", value: data.activity?.gtt_technician_comments || "" },
-                    { id: "rating-value", value: data.activity?.gtt_technician_rating || "" }
+                    { id: "feedback_comments", value: data.activity?.feedback_comments || "" },
+                    { id: "feedback_rating", value: data.activity?.feedback_rating || "" }
                 ];
 
+                // Set values for the fields
                 fields.forEach(field => {
                     const element = document.getElementById(field.id);
                     if (element) {
-                        element.value = field.value;  // Set the initial technician comment and rating
+                        if (field.id === "feedback_rating") {
+                            this._setStarRating(field.value); // Set the star rating
+                        } else {
+                            element.value = field.value; // Set the text for comments
+                        }
                     } else {
                         console.warn(`Element with ID ${field.id} not found.`);
                     }
                 });
 
                 // Initialize the star rating system
-                this._initializeStarRating();
+                this._addStarRatingListeners();
 
-                // Add event listeners for submit and clear buttons
-                this._addButtonListeners(data);
+                // Add event listeners for the submit button
+                this._addSubmitButtonListener();
             } catch (e) {
                 console.error("Error processing activity data:", e);
             }
         };
 
-        // Initialize the star rating system and handle user interactions
-        this._initializeStarRating = function () {
+        // Set the initial star rating (if a value is passed)
+        this._setStarRating = function (ratingValue) {
             const stars = document.querySelectorAll('.star');
-            const ratingInput = document.getElementById('rating-value');
-            const selectedRating = ratingInput.value;
+            stars.forEach(function (star) {
+                star.style.color = star.getAttribute('data-value') <= ratingValue ? '#ffbb33' : '#dcdcdc';
+            });
+        };
 
+        // Add event listeners for star rating
+        this._addStarRatingListeners = function () {
+            const stars = document.querySelectorAll('.star');
             stars.forEach(function (star) {
                 star.addEventListener('click', function () {
                     const selectedRating = this.getAttribute('data-value');
-                    ratingInput.value = selectedRating;
-
+                    document.getElementById('rating-value').value = selectedRating;
                     stars.forEach(function (star) {
                         star.style.color = star.getAttribute('data-value') <= selectedRating ? '#ffbb33' : '#dcdcdc';
                     });
                 });
             });
-
-            // Set the rating stars' color based on the initial rating value (if any)
-            stars.forEach(function (star) {
-                if (star.getAttribute('data-value') <= selectedRating) {
-                    star.style.color = '#ffbb33'; // Set the stars that are already rated
-                }
-            });
         };
 
-        // Add event listeners for submit and clear buttons
-        this._addButtonListeners = function (data) {
-            const submitButton = document.getElementById("submitFeedback");
+        // Add event listeners for the submit button
+        this._addSubmitButtonListener = function () {
+            const submitButton = document.getElementById("submitfeedback");
             if (submitButton) {
-                submitButton.addEventListener("click", () => this.submitData(data), { passive: true });
+                submitButton.addEventListener("click", () => {
+                    console.log("Submit button clicked");  // Debugging log
+                    this.submitData();  // Call submitData on button click
+                });
             } else {
-                console.warn("Submit button not found.");
-            }
-
-            const clearButton = document.getElementById("clearFeedback");
-            if (clearButton) {
-                clearButton.addEventListener("click", () => this.clearFeedback(), { passive: true });
-            } else {
-                console.warn("Clear button not found.");
-            }
-
-            const dismissButton = document.getElementById("Dismiss");
-            if (dismissButton) {
-                dismissButton.addEventListener("click", () => this.sendPostMessageData({ apiVersion: 1, method: "close" }), { passive: true });
-            } else {
-                console.warn("Dismiss button not found.");
+                console.warn("Submit button with id 'submitfeedback' not found.");
             }
         };
 
-        // Submit feedback data
-        this.submitData = function (data) {
-            const commentElement = document.getElementById("gtt_technician_comments");
+        // Submit data
+        this.submitData = function () {
+            const commentElement = document.getElementById("feedback_comments");
             const ratingElement = document.getElementById("rating-value");
 
-            if (commentElement) {
+            if (commentElement && ratingElement) {
                 const comment = commentElement.value.trim();
                 const rating = ratingElement.value.trim();
 
-                if (comment && rating) {
-                    try {
-                        this.sendPostMessageData({
-                            apiVersion: 1,
-                            method: "update",
-                            activity: {
-                                ...data.activity,
-                                gtt_technician_comments: comment,
-                                gtt_technician_rating: rating
-                            }
-                        });
-
-                        console.log("Data submitted successfully:", data.activity);
-
-                        alert("Form submitted successfully!");
-                        window.history.back(); // Go back to the previous page
-                    } catch (e) {
-                        console.error("Error submitting data:", e);
-                    }
-                } else {
+                // Check if both rating and comment are provided
+                if (!comment || !rating) {
                     alert("Please enter both a comment and a rating before submitting.");
+                    return;  // Prevent submission
+                }
+
+                try {
+                    // Send the feedback data to the parent system
+                    this.sendPostMessageData({
+                        apiVersion: 1,
+                        method: "update",
+                        activity: {
+                            feedback_comments: comment,
+                            feedback_rating: rating  // Send the selected rating
+                        }
+                    });
+
+                    console.log("Data submitted successfully:", comment, rating);
+
+                    // Show Thank You message and hide form elements
+                    this.showThankYouMessage();
+
+                    // Save the data in local storage (optional)
+                    this.saveFeedbackLocally(comment, rating);
+
+                } catch (e) {
+                    console.error("Error submitting data:", e);
+                    alert("An error occurred while submitting feedback. Please try again.");
                 }
             } else {
-                console.error("Element with ID 'gtt_technician_comments' not found");
+                console.error("Required elements not found.");
+                alert("Missing required elements. Please try again.");
             }
         };
 
-        // Clear the feedback form
-        this.clearFeedback = function () {
-            document.getElementById("gtt_technician_comments").value = ''; // Clear feedback comments
-            document.getElementById("rating-value").value = ''; // Clear rating value
+        // Show Thank You message and disable the form
+        this.showThankYouMessage = function () {
+            // Hide the feedback form elements
+            const feedbackSection = document.querySelector('.feedback-section');
+            const submitButton = document.getElementById('submitfeedback');
+            const header = document.querySelector('header');
+            
+            if (feedbackSection) {
+                feedbackSection.style.display = 'none';
+            }
+            if (submitButton) {
+                submitButton.style.display = 'none';
+            }
+            if (header) {
+                header.style.display = 'none';
+            }
 
-            // Reset the star colors
-            const stars = document.querySelectorAll('.star');
-            stars.forEach(function (star) {
-                star.style.color = '#dcdcdc'; // Reset stars color to default
-            });
+            // Show a Thank You message
+            const thankYouMessage = document.querySelector('.thank-you-message');
+            if (thankYouMessage) {
+                thankYouMessage.classList.add('show');
+            } else {
+                const newMessage = document.createElement('div');
+                newMessage.className = 'thank-you-message show';
+                newMessage.innerHTML = "<h2>Thank You for Your Feedback!</h2><p>Your feedback has been successfully submitted.</p>";
+                document.body.appendChild(newMessage);
+            }
+
+            // Optionally disable the "Clear" button if needed
+            const clearButton = document.getElementById("clearFeedback");
+            if (clearButton) {
+                clearButton.disabled = true;
+            }
+        };
+
+        // Save the feedback data locally
+        this.saveFeedbackLocally = function (comment, rating) {
+            const feedbackData = {
+                comment: comment,
+                rating: rating,
+                submittedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('feedbackData', JSON.stringify(feedbackData));
+            console.log("Feedback data saved locally:", feedbackData);
         };
 
         // Message listener to handle responses from the parent system
         this._messageListener = function (event) {
             try {
-                const data = JSON.parse(event.data);
-                if (data.method === "error") {
-                    console.error("Error received from parent:", JSON.stringify(data.error || "No error details available"));
-                    alert("Error: " + JSON.stringify(data.error || "No error details available"));
+                let data;
+
+                // Check if event.data is an object or a string
+                if (typeof event.data === 'string') {
+                    try {
+                        data = JSON.parse(event.data);
+                    } catch (e) {
+                        console.warn("Received data is not valid JSON:", event.data);
+                        return;
+                    }
+                } else if (typeof event.data === 'object') {
+                    data = event.data;
+                } else {
+                    console.warn('Received data is neither an object nor a string:', event.data);
                     return;
                 }
+
+                // Ensure message is coming from a trusted origin
+                const trustedOrigins = ["https://atni1.test.fs.ocs.oraclecloud.com", "http://localhost:8000"];
+
+                if (!trustedOrigins.includes(event.origin)) {
+                    console.warn('Message received from untrusted origin:', event.origin);
+                    return;
+                }
+/*
+                if (data.method === "error") {
+                    // Handle error message from parent
+                    if (data.error) {
+                        console.error("Error received from parent:", data.error);
+                        alert("Error: " + data.error);
+                    } else {
+                        console.error("Error received from parent with no details.");
+                        alert("An error occurred. Please try again.");
+                    }
+                    return;
+                }*/
 
                 switch (data.method) {
                     case "init":
@@ -181,8 +248,10 @@
                     case "close":
                         this.sendPostMessageData({ apiVersion: 1, method: "close" });
                         break;
+                        /*
                     default:
                         console.log("Unknown method:", data.method);
+                        */
                 }
             } catch (error) {
                 console.error("Error handling message:", error);

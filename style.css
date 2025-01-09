@@ -1,4 +1,4 @@
-/* General reset */
+/* General Reset */
 * {
     margin: 0;
     padding: 0;
@@ -8,182 +8,282 @@
 
 /* Body Styling */
 body {
-    background: linear-gradient(135deg, #6A82FB, #FC5C7D); /* Soft blue to pink gradient */
-    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #6A82FB, #FC5C7D); /* Gradient background */
     color: #fff;
     display: flex;
-    justify-content: center; /* Center content horizontally */
-    align-items: center; /* Center content vertically */
+    justify-content: center;
+    align-items: center;
     height: 100vh;
     flex-direction: column;
-    padding: 0 20px; /* Adds some margin on the left and right for small screens */
+    padding: 0 10px;
     overflow: hidden;
+    font-family: 'Roboto', Arial, sans-serif;
+    min-height: 100vh;
 }
 
 /* Header Styling */
 header {
     background-color: rgba(255, 255, 255, 0.1);
-    padding: 40px 30px;
-    border-radius: 20px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 100%;
-    max-width: 700px;
-    position: relative;
-    z-index: 2;
-    margin-bottom: 30px; /* Space below the header */
+    max-width: 600px;
+    margin-bottom: 20px;
 }
 
 header h1 {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: 700;
-    color: #FC5C7D; /* Vibrant pink for the title */
-    margin-bottom: 15px;
+    color: #FC5C7D;
+    margin-bottom: 10px;
     text-transform: uppercase;
 }
 
 header p {
-    font-size: 16px;
+    font-size: 14px;
     color: #fff;
-    margin-top: 5px;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
 }
 
 /* Feedback Form Container */
 .container {
-    background-color: #fff; /* Clean white background */
-    border-radius: 30px;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 700px;
-    padding: 40px;
-    margin-top: 20px;
-    position: relative;
+    max-width: 600px;
+    padding: 30px;
+    margin-top: 15px;
     transition: box-shadow 0.3s ease;
-    color: #333; /* Dark gray text for readability */
+    color: #333;
 }
 
 .container:hover {
-    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Feedback Section */
 .feedback-section {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .feedback-section h3 {
-    font-size: 32px;
-    color: #6A82FB; /* Soft blue for the header */
+    font-size: 24px;
+    color: #6A82FB;
     font-weight: 600;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    text-align: center;
+    letter-spacing: 1.5px;
 }
 
 /* Rating Section */
 .stars {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .stars .star {
-    font-size: 50px;
+    font-size: 40px;
     cursor: pointer;
-    color: #dcdcdc; /* Default star color */
+    color: #dcdcdc;
+    margin: 0 8px;
     transition: color 0.3s ease, transform 0.3s ease;
-    margin: 0 10px;
 }
 
 .stars .star:hover,
 .stars .star:hover ~ .star {
-    color: #FC5C7D; /* Highlighted star color (vibrant pink) */
-    transform: scale(1.2);
+    color: #FC5C7D;
+    transform: scale(1.1);
 }
 
 .stars .star.selected {
-    color: #6A82FB; /* Selected star color (soft blue) */
+    color: #6A82FB;
 }
 
 /* Feedback Textarea */
 textarea {
     width: 100%;
-    padding: 20px;
-    font-size: 16px;
+    padding: 15px;
+    font-size: 14px;
+    line-height: 1.5;
     border: 2px solid #ddd;
-    border-radius: 15px;
-    background-color: #f7f7f7; /* Light gray background */
+    border-radius: 12px;
+    background-color: #f7f7f7;
     color: #333;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     resize: vertical;
 }
 
 textarea:focus {
     outline: none;
-    border-color: #6A82FB; /* Soft blue border on focus */
+    border-color: #6A82FB;
     background-color: #fff;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Submit Button Styling */
-.styled-button {
-    padding: 15px 30px;
-    background-color: #6A82FB; /* Soft blue background */
+#submitfeedback {
+    padding: 12px 24px;
+    background-color: #6A82FB;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     border: none;
-    border-radius: 30px;
+    border-radius: 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-block;
-    margin-top: 30px;
-    width: 250px;
+    margin-top: 20px;
+    width: 200px;
     text-align: center;
     text-transform: uppercase;
 }
 
-.styled-button:hover {
-    background-color: #FC5C7D; /* Pink color on hover */
+#submitfeedback:hover {
+    background-color: #FC5C7D;
     transform: scale(1.05);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
 }
 
-.styled-button:focus {
-    outline: none;
+#submitfeedback:focus-visible {
+    outline: 3px solid #FC5C7D;
+}
+
+/* Clear Button Styling */
+#clearFeedback {
+    padding: 12px 24px;
+    background-color: #dcdcdc;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 20px;
+    width: 200px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#clearFeedback:hover {
+    background-color: #FC5C7D;
+    transform: scale(1.05);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+}
+
+#clearFeedback:focus-visible {
+    outline: 3px solid #FC5C7D;
+}
+
+/* Thank You Message Styling */
+.thank-you-message {
+    display: none; /* Hidden by default */
+    text-align: center;
+    background-color: #E6FFED; /* Light green background */
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.thank-you-message h2 {
+    font-size: 36px;
+    color: #4CAF50; /* Bright green */
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 1.5px;
+}
+
+.thank-you-message p {
+    font-size: 18px;
+    color: #333;
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+
+/* Show Thank You Message when feedback is submitted */
+.thank-you-message.show {
+    display: block;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     header h1 {
-        font-size: 36px;
+        font-size: 28px;
+    }
+
+    .stars .star {
+        font-size: 32px;
+    }
+
+    textarea {
+        font-size: 12px;
+        padding: 10px;
     }
 
     .styled-button {
-        width: 100%;
-        margin-top: 30px;
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+
+    #clearFeedback {
+        width: 90%;
+    }
+
+    .thank-you-message {
+        padding: 25px 15px;
     }
 }
 
 @media (max-width: 480px) {
     header h1 {
-        font-size: 30px;
+        font-size: 24px;
     }
 
     .stars .star {
-        font-size: 40px;
+        font-size: 28px;
     }
 
     textarea {
-        font-size: 14px;
-        padding: 12px;
+        font-size: 12px;
+        padding: 8px;
     }
 
     .styled-button {
-        padding: 12px 20px;
-        font-size: 16px;
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    #clearFeedback {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+
+    .thank-you-message {
+        padding: 20px 10px;
+        max-width: 90%;
     }
 }
+
+/* Animation on Hover for Buttons */
+button {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.hidden { display: none; }
+
+.thank-you-message.show { display: block; }
+
